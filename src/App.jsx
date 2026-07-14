@@ -123,31 +123,29 @@ const Magnet = ({ children, padding = 150, strength = 3 }) => {
 
 const Avatar3D = () => {
   return (
-    <div className="w-[280px] sm:w-[360px] md:w-[420px] lg:w-[480px]">
-      <Magnet padding={150} strength={3}>
-        <div className="relative rounded-3xl overflow-hidden border-2 border-[#D7E2EA]/30"
+    <Magnet padding={150} strength={3}>
+      <div className="relative w-[280px] sm:w-[360px] md:w-[420px] lg:w-[480px] rounded-3xl overflow-hidden border-2 border-[#D7E2EA]/30"
+        style={{
+          background: 'radial-gradient(circle at 30% 30%, rgba(215, 226, 234, 0.1), transparent 50%)',
+          boxShadow: '0 20px 60px rgba(182, 0, 168, 0.3), inset 0 0 60px rgba(215, 226, 234, 0.05)'
+        }}>
+        <img
+          src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAIBAQIBAQICAgICAgICAwUDAwwUBAwMBwkMBwMEBwcOBxcGBwcODgsMDg4PEA8OExMTEg0LExMTGRYSEg0SEgz/2wBDAQICAgMDAwYDAwYMCAcIDAwYDAwYGBAMDAwYEBwMDAwYFBwMDAwYHBwcODgwMDg4PEA8OExMTEg0LExMTGRYSEg0SEgz/wAARCADIAMgDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWm5ydn5KjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlbaWmJ2eoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD9/KKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigD/2Q=="
+          alt="Sankil Sudrik"
+          className="w-full h-full object-cover"
+        />
+        <motion.div 
+          className="absolute inset-0 rounded-3xl"
+          animate={{ opacity: [0.3, 0.6, 0.3] }}
+          transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
           style={{
-            background: 'radial-gradient(circle at 30% 30%, rgba(215, 226, 234, 0.1), transparent 50%)',
-            boxShadow: '0 20px 60px rgba(182, 0, 168, 0.3), inset 0 0 60px rgba(215, 226, 234, 0.05)'
-          }}>
-          <img
-            src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAIBAQIBAQICAgICAgICAwUDAwwUBAwMBwkMBwMEBwcOBxcGBwcODgsMDg4PEA8OExMTEg0LExMTGRYSEg0SEgz/2wBDAQICAgMDAwYDAwYMCAcIDAwYDAwYGBAMDAwYEBwMDAwYFBwMDAwYHBwcODgwMDg4PEA8OExMTEg0LExMTGRYSEg0SEgz/wAARCADIAMgDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWm5ydn5KjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlbaWmJ2eoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD9/KKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigD/2Q=="
-            alt="Sankil Sudrik"
-            className="w-full h-full object-cover"
-          />
-          <motion.div 
-            className="absolute inset-0 rounded-3xl"
-            animate={{ opacity: [0.3, 0.6, 0.3] }}
-            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-            style={{
-              background: 'radial-gradient(circle at 50% 50%, rgba(182, 0, 168, 0.4), transparent 70%)',
-            }}
-          />
-          <div className="absolute top-0 left-0 w-32 h-32 bg-gradient-to-br from-[#B600A8]/20 to-transparent rounded-full blur-3xl" />
-          <div className="absolute bottom-0 right-0 w-32 h-32 bg-gradient-to-tl from-[#7621B0]/20 to-transparent rounded-full blur-3xl" />
-        </div>
-      </Magnet>
-    </div>
+            background: 'radial-gradient(circle at 50% 50%, rgba(182, 0, 168, 0.4), transparent 70%)',
+          }}
+        />
+        <div className="absolute top-0 left-0 w-32 h-32 bg-gradient-to-br from-[#B600A8]/20 to-transparent rounded-full blur-3xl" />
+        <div className="absolute bottom-0 right-0 w-32 h-32 bg-gradient-to-tl from-[#7621B0]/20 to-transparent rounded-full blur-3xl" />
+      </div>
+    </Magnet>
   );
 };
 
@@ -174,10 +172,10 @@ const HeroSection = () => {
         </nav>
       </FadeIn>
 
-      <div className="flex-1 flex flex-col justify-between relative">
+      <div className="flex-1 flex flex-col justify-between relative px-6 md:px-10">
         <div className="mt-6 sm:mt-4 md:-mt-5 overflow-hidden">
           <FadeIn delay={0.15} y={40}>
-            <GradientHeading className="font-black uppercase tracking-tight leading-none whitespace-nowrap w-full" style={{ fontSize: 'clamp(12vw, 14vw, 16vw)' }}>
+            <GradientHeading className="font-black uppercase tracking-tight leading-none whitespace-nowrap" style={{ fontSize: 'clamp(12vw, 14vw, 16vw)' }}>
               AI/ML Engineer
             </GradientHeading>
           </FadeIn>
@@ -188,7 +186,7 @@ const HeroSection = () => {
           </FadeIn>
         </div>
 
-        <div className="flex justify-between items-end pb-7 sm:pb-8 md:pb-10 px-6 md:px-10 gap-4">
+        <div className="flex justify-between items-end pb-7 sm:pb-8 md:pb-10 gap-4">
           <FadeIn delay={0.35} y={20}>
             <p className="text-[#D7E2EA] font-light uppercase tracking-wide leading-snug" style={{ fontSize: 'clamp(0.75rem, 1.4vw, 1.5rem)', maxWidth: 'clamp(160px, 30vw, 260px)' }}>
               AI/ML specialist building smart applications. Love solving complex problems with data and code.
@@ -201,7 +199,7 @@ const HeroSection = () => {
       </div>
 
       <FadeIn delay={0.6} y={30}>
-        <div className="absolute left-1/2 -translate-x-1/2 z-10 md:bottom-0 md:translate-y-0 top-1/2 md:top-auto -translate-y-1/2 md:-translate-y-0">
+        <div className="absolute right-0 top-1/2 -translate-y-1/2 md:right-10 md:top-auto md:bottom-0 md:translate-y-0 z-20 pointer-events-auto">
           <Avatar3D />
         </div>
       </FadeIn>
@@ -264,16 +262,22 @@ const ProjectCard = ({ project, index, total }) => {
   const containerRef = useRef(null);
   const { scrollYProgress } = useScroll({
     target: containerRef,
-    offset: ['start center', 'end center']
+    offset: ['start 80%', 'end 20%']
   });
 
-  const scale = useTransform(scrollYProgress, [0, 1], [1 - (total - 1 - index) * 0.03, 1]);
+  const scale = useTransform(scrollYProgress, [0, 1], [0.85, 1]);
+  const opacity = useTransform(scrollYProgress, [0, 1], [0.6, 1]);
 
   return (
     <motion.div
       ref={containerRef}
-      style={{ scale, top: `${index * 28}px`, zIndex: total - index }}
-      className="sticky rounded-[40px] sm:rounded-[50px] md:rounded-[60px] border-2 border-[#D7E2EA] bg-[#0C0C0C] p-4 sm:p-6 md:p-8"
+      style={{ 
+        scale, 
+        opacity,
+        position: 'relative',
+        zIndex: index
+      }}
+      className="rounded-[40px] sm:rounded-[50px] md:rounded-[60px] border-2 border-[#D7E2EA] bg-[#0C0C0C] p-4 sm:p-6 md:p-8"
     >
       <div className="flex flex-wrap items-start justify-between gap-4 mb-8 pb-8 border-b border-[#D7E2EA]/20">
         <div className="flex-1">
