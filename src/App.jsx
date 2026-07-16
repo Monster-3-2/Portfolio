@@ -124,27 +124,36 @@ const Magnet = ({ children, padding = 150, strength = 3 }) => {
 const Avatar3D = () => {
   return (
     <Magnet padding={150} strength={3}>
-      <div className="relative w-[250px] sm:w-[320px] md:w-[380px] rounded-3xl overflow-hidden border-2 border-[#D7E2EA]/40"
+      <motion.div
+        animate={{ 
+          rotateY: [0, 5, -5, 0],
+          rotateX: [-2, 2, -2, 0],
+        }}
+        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+        className="relative w-[250px] sm:w-[320px] md:w-[380px] rounded-3xl overflow-hidden border-2 border-[#D7E2EA]/40"
         style={{
-          background: 'radial-gradient(circle at 30% 30%, rgba(215, 226, 234, 0.1), transparent 50%)',
-          boxShadow: '0 20px 60px rgba(182, 0, 168, 0.3), inset 0 0 60px rgba(215, 226, 234, 0.05)'
+          background: 'radial-gradient(circle at 30% 30%, rgba(215, 226, 234, 0.15), transparent 50%)',
+          boxShadow: '0 20px 60px rgba(182, 0, 168, 0.4), inset 0 0 60px rgba(215, 226, 234, 0.08), 0 0 40px rgba(182, 0, 168, 0.2)',
+          perspective: '1000px',
+          transformStyle: 'preserve-3d'
         }}>
         <img
-          src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=500&fit=crop"
+          src="https://drive.google.com/uc?export=view&id=1KRQpvGN7FBE4xlzBHL4nXOAu6Vw6V9XW"
           alt="Sankil Sudrik"
           className="w-full h-full object-cover"
         />
         <motion.div 
           className="absolute inset-0 rounded-3xl"
-          animate={{ opacity: [0.3, 0.6, 0.3] }}
+          animate={{ opacity: [0.4, 0.7, 0.4] }}
           transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
           style={{
-            background: 'radial-gradient(circle at 50% 50%, rgba(182, 0, 168, 0.4), transparent 70%)',
+            background: 'radial-gradient(circle at 50% 50%, rgba(182, 0, 168, 0.5), transparent 70%)',
           }}
         />
-        <div className="absolute top-0 left-0 w-32 h-32 bg-gradient-to-br from-[#B600A8]/20 to-transparent rounded-full blur-3xl" />
-        <div className="absolute bottom-0 right-0 w-32 h-32 bg-gradient-to-tl from-[#7621B0]/20 to-transparent rounded-full blur-3xl" />
-      </div>
+        <div className="absolute top-0 left-0 w-40 h-40 bg-gradient-to-br from-[#B600A8]/30 to-transparent rounded-full blur-3xl" />
+        <div className="absolute bottom-0 right-0 w-40 h-40 bg-gradient-to-tl from-[#7621B0]/30 to-transparent rounded-full blur-3xl" />
+        <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-white/10 via-transparent to-black/20" />
+      </motion.div>
     </Magnet>
   );
 };
