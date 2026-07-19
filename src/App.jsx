@@ -505,7 +505,7 @@ const ProjectCard = ({ project, index, total }) => {
         scale,
         position: 'sticky',
         top: `${60 + index * 30}px`,
-        zIndex: total - index,
+        zIndex: index + 1,
         marginBottom: index < total - 1 ? '-80px' : '0px'
       }}
       className="rounded-[40px] sm:rounded-[50px] md:rounded-[60px] border-2 border-[#D7E2EA] bg-[#0C0C0C] p-4 sm:p-6 md:p-8"
