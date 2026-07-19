@@ -136,45 +136,44 @@ const Avatar3D = () => {
     try {
       // Scene setup
       const scene = new THREE.Scene();
-      scene.background = new THREE.Color(0x0C0C0C);
+      scene.background = null; // Changed to null for container-level background transitions
       sceneRef.current = scene;
 
       const width = containerRef.current.clientWidth;
       const height = containerRef.current.clientHeight;
 
-      const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
-      camera.position.z = 2.5;
+      const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+      camera.position.set(0, 0, 2.5);
 
       const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
       renderer.setSize(width, height);
-      renderer.setPixelRatio(window.devicePixelRatio);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
       renderer.shadowMap.enabled = true;
       containerRef.current.appendChild(renderer.domElement);
       rendererRef.current = renderer;
 
-      // Lighting
-      const ambientLight = new THREE.AmbientLight(0xffffff, 1.2);
+      // Lighting Setup
+      const ambientLight = new THREE.AmbientLight(0xffffff, 1.5);
       scene.add(ambientLight);
 
-      const pointLight = new THREE.PointLight(0xB600A8, 1.5);
-      pointLight.position.set(5, 5, 5);
-      pointLight.castShadow = true;
+      const directionalLight = new THREE.DirectionalLight(0xffffff, 1.8);
+      directionalLight.position.set(2, 4, 5);
+      directionalLight.castShadow = true;
+      scene.add(directionalLight);
+
+      const pointLight = new THREE.PointLight(0xB600A8, 2);
+      pointLight.position.set(3, 2, 2);
       scene.add(pointLight);
 
-      const pointLight2 = new THREE.PointLight(0x7621B0, 1);
-      pointLight2.position.set(-5, -5, 5);
+      const pointLight2 = new THREE.PointLight(0x7621B0, 1.5);
+      pointLight2.position.set(-3, -2, 2);
       scene.add(pointLight2);
 
-      const pointLight3 = new THREE.PointLight(0xffffff, 0.8);
-      pointLight3.position.set(0, 3, 3);
-      scene.add(pointLight3);
-
-      // Create fallback geometry if model doesn't load
+      // Procedural Fallback Blueprint
       const createFallbackAvatar = () => {
         const group = new THREE.Group();
 
-        // Head
-        const headGeom = new THREE.SphereGeometry(0.8, 32, 32);
+        const headGeom = new THREE.SphereGeometry(0.5, 32, 32);
         const headMat = new THREE.MeshPhongMaterial({
           color: 0xF4E4D7,
           shininess: 100,
@@ -185,79 +184,57 @@ const Avatar3D = () => {
         head.position.y = 0.2;
         group.add(head);
 
-        // Hair
-        const hairGeom = new THREE.ConeGeometry(0.9, 0.8, 32);
-        const hairMat = new THREE.MeshPhongMaterial({
-          color: 0x2C1810,
-          shininess: 30,
-        });
+        const hairGeom = new THREE.ConeGeometry(0.55, 0.6, 32);
+        const hairMat = new THREE.MeshPhongMaterial({ color: 0x2C1810, shininess: 30 });
         const hair = new THREE.Mesh(hairGeom, hairMat);
-        hair.position.y = 1.1;
+        hair.position.y = 0.75;
         group.add(hair);
 
-        // Left Eye
-        const eyeGeom = new THREE.SphereGeometry(0.15, 16, 16);
+        const eyeGeom = new THREE.SphereGeometry(0.08, 16, 16);
         const eyeMat = new THREE.MeshPhongMaterial({ color: 0xFFFFFF });
         const leftEye = new THREE.Mesh(eyeGeom, eyeMat);
-        leftEye.position.set(-0.25, 0.4, 0.7);
+        leftEye.position.set(-0.18, 0.3, 0.42);
         group.add(leftEye);
 
-        // Right Eye
         const rightEye = new THREE.Mesh(eyeGeom, eyeMat);
-        rightEye.position.set(0.25, 0.4, 0.7);
+        rightEye.position.set(0.18, 0.3, 0.42);
         group.add(rightEye);
 
-        // Left Iris
-        const irisGeom = new THREE.SphereGeometry(0.08, 16, 16);
+        const irisGeom = new THREE.SphereGeometry(0.04, 16, 16);
         const irisMat = new THREE.MeshPhongMaterial({ color: 0x4A90E2 });
         const leftIris = new THREE.Mesh(irisGeom, irisMat);
-        leftIris.position.set(-0.25, 0.4, 0.82);
+        leftIris.position.set(-0.18, 0.3, 0.49);
         group.add(leftIris);
 
-        // Right Iris
         const rightIris = new THREE.Mesh(irisGeom, irisMat);
-        rightIris.position.set(0.25, 0.4, 0.82);
+        rightIris.position.set(0.18, 0.3, 0.49);
         group.add(rightIris);
-
-        // Mouth
-        const mouthGeom = new THREE.TorusGeometry(0.2, 0.05, 16, 100, 0, Math.PI);
-        const mouthMat = new THREE.MeshPhongMaterial({ color: 0xC85A54 });
-        const mouth = new THREE.Mesh(mouthGeom, mouthMat);
-        mouth.position.set(0, -0.1, 0.7);
-        mouth.rotation.z = Math.PI;
-        group.add(mouth);
-
-        // Nose
-        const noseGeom = new THREE.ConeGeometry(0.08, 0.3, 16);
-        const noseMat = new THREE.MeshPhongMaterial({ color: 0xD4845E });
-        const nose = new THREE.Mesh(noseGeom, noseMat);
-        nose.position.set(0, 0.1, 0.75);
-        nose.rotation.x = Math.PI / 2;
-        group.add(nose);
 
         return group;
       };
 
-      // Load GLB model
+      // Load Local GLB model from Public Asset Pipeline
       const loader = new GLTFLoader();
       
       loader.load(
-        'https://cdn.jsdelivr.net/npm/@google/model-viewer/dist/assets/model-viewer.usdz',
+        '/assets/my-avatar.glb', 
         (gltf) => {
           const model = gltf.scene;
-          model.scale.set(1.2, 1.2, 1.2);
-          model.position.y = 0;
+          
+          // Balanced dimensions to frame standard human skeletal rigs inside the section layout
+          model.scale.set(0.95, 0.95, 0.95);
+          model.position.y = -0.95; 
 
           model.traverse((child) => {
             if (child.isMesh) {
               child.castShadow = true;
               child.receiveShadow = true;
-              child.material = new THREE.MeshPhongMaterial({
-                color: 0xF4E4D7,
-                shininess: 100,
-                emissive: 0x7621B0,
-                emissiveIntensity: 0.2,
-              });
+              
+              // Maintain original colors and custom designs maps
+              if (child.material) {
+                child.material.roughness = 0.55;
+                child.material.metalness = 0.15;
+              }
             }
           });
 
@@ -266,8 +243,8 @@ const Avatar3D = () => {
           setLoading(false);
         },
         undefined,
-        () => {
-          // Model loading failed - use fallback
+        (error) => {
+          console.error('Avatar failed to parse, loading local viewport meshes:', error);
           const fallback = createFallbackAvatar();
           scene.add(fallback);
           modelRef.current = fallback;
@@ -275,16 +252,7 @@ const Avatar3D = () => {
         }
       );
 
-      // If model URL doesn't work, use fallback immediately
-      setTimeout(() => {
-        if (!modelRef.current) {
-          const fallback = createFallbackAvatar();
-          scene.add(fallback);
-          modelRef.current = fallback;
-          setLoading(false);
-        }
-      }, 3000);
-
+      // Active mouse interactive listeners
       let mouseX = 0;
       let mouseY = 0;
 
@@ -295,15 +263,16 @@ const Avatar3D = () => {
 
       window.addEventListener('mousemove', handleMouseMove);
 
-      // Animation loop
+      // View Rendering loop cycles
       let animationId;
       const animate = () => {
         animationId = requestAnimationFrame(animate);
 
         if (modelRef.current) {
-          modelRef.current.rotation.y += 0.003;
-          modelRef.current.rotation.x += mouseY * 0.0005;
-          modelRef.current.rotation.z += mouseX * 0.0005;
+          // Smooth structural rotations synchronized to tracking offsets
+          modelRef.current.rotation.y += 0.004;
+          modelRef.current.rotation.x = THREE.MathUtils.lerp(modelRef.current.rotation.x, mouseY * 0.2, 0.05);
+          modelRef.current.rotation.z = THREE.MathUtils.lerp(modelRef.current.rotation.z, -mouseX * 0.1, 0.05);
         }
 
         renderer.render(scene, camera);
@@ -311,7 +280,6 @@ const Avatar3D = () => {
 
       animate();
 
-      // Handle window resize
       const handleResize = () => {
         if (!containerRef.current) return;
         const newWidth = containerRef.current.clientWidth;
@@ -333,7 +301,7 @@ const Avatar3D = () => {
         renderer.dispose();
       };
     } catch (error) {
-      console.error('Avatar3D error:', error);
+      console.error('Avatar3D Runtime Context Fault:', error);
       setLoading(false);
     }
   }, []);
@@ -346,7 +314,7 @@ const Avatar3D = () => {
         style={{
           background: 'radial-gradient(circle at 30% 30%, rgba(215, 226, 234, 0.15), transparent 50%)',
           boxShadow: '0 20px 60px rgba(182, 0, 168, 0.4), inset 0 0 60px rgba(215, 226, 234, 0.08)',
-          height: '350px'
+          height: '420px'
         }}
       >
         {loading && (
@@ -382,10 +350,10 @@ const HeroSection = () => {
         <nav className="flex justify-between items-center px-6 md:px-10 pt-6 md:pt-8 relative z-50 backdrop-blur-xl bg-white/8 rounded-2xl mx-6 md:mx-10 border border-white/15 shadow-2xl" style={{ backdropFilter: 'blur(20px)', boxShadow: '0 8px 32px rgba(255, 255, 255, 0.1)' }}>
           <div className="px-6 md:px-8 py-3">
             <div className="text-[#D7E2EA] font-black uppercase tracking-wider leading-none" style={{ fontSize: 'clamp(1.2rem, 2vw, 1.8rem)', fontWeight: 900, letterSpacing: '0.08em' }}>
-              Sankil Sudrik
+              Sankil Sudrik[cite: 1]
             </div>
             <div className="text-[#D7E2EA]/85 font-black uppercase tracking-wider leading-none mt-0.5" style={{ fontSize: 'clamp(0.8rem, 1.3vw, 1.1rem)', fontWeight: 900, letterSpacing: '0.08em' }}>
-              AI/ML Engineer
+              AI/ML Engineer[cite: 1]
             </div>
           </div>
           <div className="flex gap-6 md:gap-8 pr-6 md:pr-8">
@@ -407,12 +375,12 @@ const HeroSection = () => {
         <div className="mt-6 sm:mt-4 md:-mt-5 overflow-hidden px-6 md:px-10">
           <FadeIn delay={0.15} y={40}>
             <GradientHeading className="font-black uppercase tracking-tight leading-none whitespace-normal" style={{ fontSize: 'clamp(12vw, 14vw, 16vw)', maxWidth: '100%' }}>
-              AI/ML Engineer
+              AI/ML Engineer[cite: 1]
             </GradientHeading>
           </FadeIn>
           <FadeIn delay={0.2} y={40}>
             <p className="text-[#D7E2EA] font-light mt-4" style={{ fontSize: 'clamp(0.9rem, 2vw, 1.3rem)' }}>
-              Machine Learning Engineer • Python Developer • Problem Solver
+              Machine Learning Engineer • Python Developer • Problem Solver[cite: 1]
             </p>
           </FadeIn>
         </div>
@@ -420,7 +388,7 @@ const HeroSection = () => {
         <div className="flex justify-between items-end pb-7 sm:pb-8 md:pb-10 px-6 md:px-10 gap-4 flex-wrap">
           <FadeIn delay={0.35} y={20}>
             <p className="text-[#D7E2EA] font-light uppercase tracking-wide leading-snug" style={{ fontSize: 'clamp(0.7rem, 1.3vw, 1.2rem)', maxWidth: 'clamp(140px, 25vw, 240px)' }}>
-              AI/ML specialist building smart applications. Love solving complex problems with data and code.
+              AI/ML specialist building smart applications. Love solving complex problems with data and code.[cite: 1]
             </p>
           </FadeIn>
           <FadeIn delay={0.5} y={20}>
@@ -430,7 +398,7 @@ const HeroSection = () => {
       </div>
 
       <FadeIn delay={0.6} y={30}>
-        <div className="absolute right-6 md:right-10 top-1/3 md:top-1/2 md:-translate-y-1/2 z-10">
+        <div className="absolute right-6 md:right-10 top-1/4 md:top-1/2 md:-translate-y-1/2 z-10">
           <Avatar3D />
         </div>
       </FadeIn>
@@ -573,11 +541,11 @@ const SkillsSection = () => {
     },
     {
       title: 'Backend & Data',
-      skills: ['Python', 'FastAPI', 'Flask', 'SQL', 'Supabase', 'PostgreSQL']
+      skills: ['Python', 'FastAPI', 'Flask', 'SQL', 'Supabase', 'PostgreSQL'][cite: 1]
     },
     {
       title: 'AI & ML',
-      skills: ['Machine Learning', 'NLP', 'Sci-Kit Learn', 'Pandas', 'Statistical Analysis']
+      skills: ['Machine Learning', 'NLP', 'Sci-Kit Learn', 'Pandas', 'Statistical Analysis'][cite: 1]
     },
     {
       title: 'Soft Skills',
@@ -621,25 +589,25 @@ const ExperienceSection = () => {
       period: '07/2026 - Present',
       role: 'Jr. HR Executive',
       company: 'Inamigos Foundation',
-      desc: 'Developing expertise in people management, employee engagement, and organizational development.'
+      desc: 'Developing expertise in people management, employee engagement, and organizational development.'[cite: 1]
     },
     {
       period: '06/2026 - 07/2026',
       role: 'Web Developer',
       company: 'Inamigos Foundation',
-      desc: 'Contributed to meaningful web projects and enhanced full-stack development skills.'
+      desc: 'Contributed to meaningful web projects and enhanced full-stack development skills.'[cite: 1]
     },
     {
       period: '06/2026 - 07/2026',
       role: 'AI Data Analyst',
       company: 'Inamigos Foundation',
-      desc: 'Worked on data-driven projects with focus on analytical thinking and real-world problem solving.'
+      desc: 'Worked on data-driven projects with focus on analytical thinking and real-world problem solving.'[cite: 1]
     },
     {
       period: '05/2026 - 06/2026',
       role: 'Technical Intern',
       company: 'Decodelabs',
-      desc: 'Completed rigorous accelerated program focused on practical engineering and development skills.'
+      desc: 'Completed rigorous accelerated program focused on practical engineering and development skills.'[cite: 1]
     }
   ];
 
@@ -717,7 +685,7 @@ const ContactSection = () => {
         <FadeIn delay={0.6}>
           <div className="mt-16 pt-8 border-t border-[#0C0C0C]/10">
             <p className="text-[#0C0C0C]/60 font-light text-xs sm:text-sm">
-              © 2026 Sankil Sudrik. Building intelligent solutions with AI & ML.
+              © 2026 Sankil Sudrik. Building intelligent solutions with AI & ML.[cite: 1]
             </p>
           </div>
         </FadeIn>
