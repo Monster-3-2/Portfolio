@@ -134,7 +134,6 @@ const Avatar3D = () => {
     if (!containerRef.current) return;
 
     try {
-      // Scene setup
       const scene = new THREE.Scene();
       scene.background = null;
       sceneRef.current = scene;
@@ -152,7 +151,6 @@ const Avatar3D = () => {
       containerRef.current.appendChild(renderer.domElement);
       rendererRef.current = renderer;
 
-      // Lighting Setup
       const ambientLight = new THREE.AmbientLight(0xffffff, 1.5);
       scene.add(ambientLight);
 
@@ -169,7 +167,6 @@ const Avatar3D = () => {
       pointLight2.position.set(-3, -2, 2);
       scene.add(pointLight2);
 
-      // Procedural Fallback Blueprint
       const createFallbackAvatar = () => {
         const group = new THREE.Group();
 
@@ -213,7 +210,6 @@ const Avatar3D = () => {
         return group;
       };
 
-      // Load Local GLB model from Public Asset Pipeline
       const loader = new GLTFLoader();
       
       loader.load(
@@ -250,7 +246,6 @@ const Avatar3D = () => {
         }
       );
 
-      // Active mouse interactive listeners
       let mouseX = 0;
       let mouseY = 0;
 
@@ -261,7 +256,6 @@ const Avatar3D = () => {
 
       window.addEventListener('mousemove', handleMouseMove);
 
-      // View Rendering loop cycles
       let animationId;
       const animate = () => {
         animationId = requestAnimationFrame(animate);
@@ -347,10 +341,10 @@ const HeroSection = () => {
         <nav className="flex justify-between items-center px-6 md:px-10 pt-6 md:pt-8 relative z-50 backdrop-blur-xl bg-white/8 rounded-2xl mx-6 md:mx-10 border border-white/15 shadow-2xl" style={{ backdropFilter: 'blur(20px)', boxShadow: '0 8px 32px rgba(255, 255, 255, 0.1)' }}>
           <div className="px-6 md:px-8 py-3">
             <div className="text-[#D7E2EA] font-black uppercase tracking-wider leading-none" style={{ fontSize: 'clamp(1.2rem, 2vw, 1.8rem)', fontWeight: 900, letterSpacing: '0.08em' }}>
-              Sankil Sudrik[cite: 1]
+              Sankil Sudrik
             </div>
             <div className="text-[#D7E2EA]/85 font-black uppercase tracking-wider leading-none mt-0.5" style={{ fontSize: 'clamp(0.8rem, 1.3vw, 1.1rem)', fontWeight: 900, letterSpacing: '0.08em' }}>
-              AI/ML Engineer[cite: 1]
+              AI/ML Engineer
             </div>
           </div>
           <div className="flex gap-6 md:gap-8 pr-6 md:pr-8">
@@ -372,12 +366,12 @@ const HeroSection = () => {
         <div className="mt-6 sm:mt-4 md:-mt-5 overflow-hidden px-6 md:px-10">
           <FadeIn delay={0.15} y={40}>
             <GradientHeading className="font-black uppercase tracking-tight leading-none whitespace-normal" style={{ fontSize: 'clamp(12vw, 14vw, 16vw)', maxWidth: '100%' }}>
-              AI/ML Engineer[cite: 1]
+              AI/ML Engineer
             </GradientHeading>
           </FadeIn>
           <FadeIn delay={0.2} y={40}>
             <p className="text-[#D7E2EA] font-light mt-4" style={{ fontSize: 'clamp(0.9rem, 2vw, 1.3rem)' }}>
-              Machine Learning Engineer • Python Developer • Problem Solver[cite: 1]
+              Machine Learning Engineer • Python Developer • Problem Solver
             </p>
           </FadeIn>
         </div>
@@ -385,7 +379,7 @@ const HeroSection = () => {
         <div className="flex justify-between items-end pb-7 sm:pb-8 md:pb-10 px-6 md:px-10 gap-4 flex-wrap">
           <FadeIn delay={0.35} y={20}>
             <p className="text-[#D7E2EA] font-light uppercase tracking-wide leading-snug" style={{ fontSize: 'clamp(0.7rem, 1.3vw, 1.2rem)', maxWidth: 'clamp(140px, 25vw, 240px)' }}>
-              AI/ML specialist building smart applications. Love solving complex problems with data and code.[cite: 1]
+              AI/ML specialist building smart applications. Love solving complex problems with data and code.
             </p>
           </FadeIn>
           <FadeIn delay={0.5} y={20}>
@@ -538,11 +532,11 @@ const SkillsSection = () => {
     },
     {
       title: 'Backend & Data',
-      skills: ['Python', 'FastAPI', 'Flask', 'SQL', 'Supabase', 'PostgreSQL'][cite: 1]
+      skills: ['Python', 'FastAPI', 'Flask', 'SQL', 'Supabase', 'PostgreSQL']
     },
     {
       title: 'AI & ML',
-      skills: ['Machine Learning', 'NLP', 'Sci-Kit Learn', 'Pandas', 'Statistical Analysis'][cite: 1]
+      skills: ['Machine Learning', 'NLP', 'Sci-Kit Learn', 'Pandas', 'Statistical Analysis']
     },
     {
       title: 'Soft Skills',
@@ -586,25 +580,25 @@ const ExperienceSection = () => {
       period: '07/2026 - Present',
       role: 'Jr. HR Executive',
       company: 'Inamigos Foundation',
-      desc: 'Developing expertise in people management, employee engagement, and organizational development.'[cite: 1]
+      desc: 'Developing expertise in people management, employee engagement, and organizational development.'
     },
     {
       period: '06/2026 - 07/2026',
       role: 'Web Developer',
       company: 'Inamigos Foundation',
-      desc: 'Contributed to meaningful web projects and enhanced full-stack development skills.'[cite: 1]
+      desc: 'Contributed to meaningful web projects and enhanced full-stack development skills.'
     },
     {
       period: '06/2026 - 07/2026',
       role: 'AI Data Analyst',
       company: 'Inamigos Foundation',
-      desc: 'Worked on data-driven projects with focus on analytical thinking and real-world problem solving.'[cite: 1]
+      desc: 'Worked on data-driven projects with focus on analytical thinking and real-world problem solving.'
     },
     {
       period: '05/2026 - 06/2026',
       role: 'Technical Intern',
       company: 'Decodelabs',
-      desc: 'Completed rigorous accelerated program focused on practical engineering and development skills.'[cite: 1]
+      desc: 'Completed rigorous accelerated program focused on practical engineering and development skills.'
     }
   ];
 
@@ -682,7 +676,7 @@ const ContactSection = () => {
         <FadeIn delay={0.6}>
           <div className="mt-16 pt-8 border-t border-[#0C0C0C]/10">
             <p className="text-[#0C0C0C]/60 font-light text-xs sm:text-sm">
-              © 2026 Sankil Sudrik. Building intelligent solutions with AI & ML.[cite: 1]
+              © 2026 Sankil Sudrik. Building intelligent solutions with AI & ML.
             </p>
           </div>
         </FadeIn>
