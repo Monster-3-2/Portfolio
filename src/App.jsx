@@ -497,14 +497,12 @@ const ProjectCard = ({ project, index, total }) => {
   });
 
   const scale = useTransform(scrollYProgress, [0, 1], [0.85, 1]);
-  const opacity = useTransform(scrollYProgress, [0, 1], [0.5, 1]);
 
   return (
     <motion.div
       ref={containerRef}
       style={{
         scale,
-        opacity,
         position: 'sticky',
         top: `${60 + index * 30}px`,
         zIndex: total - index,
