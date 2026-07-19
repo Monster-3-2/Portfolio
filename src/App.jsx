@@ -2,6 +2,8 @@ import React, { useRef, useEffect, useState } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { Mail, Github, Linkedin, Download, ExternalLink } from 'lucide-react';
 import * as THREE from 'three';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
 const GradientHeading = ({ children, className = '' }) => (
   <h1 className={`bg-gradient-to-b from-[#646973] to-[#BBCCD7] bg-clip-text text-transparent ${className}`}>
@@ -124,119 +126,130 @@ const Magnet = ({ children, padding = 150, strength = 3 }) => {
 
 const Avatar3D = () => {
   const containerRef = useRef(null);
+  const sceneRef = useRef(null);
+  const rendererRef = useRef(null);
+  const modelRef = useRef(null);
 
   useEffect(() => {
     if (!containerRef.current) return;
 
+    // Scene setup
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x0C0C0C);
-    
-    const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
-    camera.position.z = 2.5;
+    sceneRef.current = scene;
 
-    const canvas = document.createElement('canvas');
-    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-    renderer.setSize(300, 350);
+    const camera = new THREE.PerspectiveCamera(
+      75,
+      containerRef.current.clientWidth / containerRef.current.clientHeight,
+      0.1,
+      1000
+    );
+    camera.position.z = 2;
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setSize(containerRef.current.clientWidth, containerRef.current.clientHeight);
     renderer.setPixelRatio(window.devicePixelRatio);
-    containerRef.current.appendChild(canvas);
+    renderer.shadowMap.enabled = true;
+    containerRef.current.appendChild(renderer.domElement);
+    rendererRef.current = renderer;
 
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+    // Lighting
+    const ambientLight = new THREE.AmbientLight(0xffffff, 1);
     scene.add(ambientLight);
 
-    const pointLight = new THREE.PointLight(0xB600A8, 1.2);
+    const pointLight = new THREE.PointLight(0xB600A8, 1.5);
     pointLight.position.set(5, 5, 5);
+    pointLight.castShadow = true;
     scene.add(pointLight);
 
-    const pointLight2 = new THREE.PointLight(0x7621B0, 0.8);
+    const pointLight2 = new THREE.PointLight(0x7621B0, 1);
     pointLight2.position.set(-5, -5, 5);
     scene.add(pointLight2);
 
-    const geometry = new THREE.IcosahedronGeometry(1, 6);
-    
-    const canvas2d = document.createElement('canvas');
-    canvas2d.width = 512;
-    canvas2d.height = 512;
-    const ctx = canvas2d.getContext('2d');
-    
-    const gradient = ctx.createLinearGradient(0, 0, 512, 512);
-    gradient.addColorStop(0, '#B600A8');
-    gradient.addColorStop(0.5, '#7621B0');
-    gradient.addColorStop(1, '#18011F');
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, 512, 512);
+    const pointLight3 = new THREE.PointLight(0xffffff, 0.5);
+    pointLight3.position.set(0, 3, 3);
+    scene.add(pointLight3);
 
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
-    ctx.beginPath();
-    ctx.arc(180, 180, 60, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.arc(330, 180, 60, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.arc(255, 350, 80, 0, Math.PI * 2);
-    ctx.fill();
+    // Load GLB model
+    const loader = new GLTFLoader();
+    loader.load(
+      '/white_mesh.glb',
+      (gltf) => {
+        const model = gltf.scene;
+        model.scale.set(1.2, 1.2, 1.2);
+        model.position.y = 0;
 
-    const texture = new THREE.CanvasTexture(canvas2d);
-    const material = new THREE.MeshPhongMaterial({ 
-      map: texture,
-      emissive: 0x7621B0,
-      emissiveIntensity: 0.3,
-      shininess: 100,
-      wireframe: false
-    });
+        // Apply materials
+        model.traverse((child) => {
+          if (child.isMesh) {
+            child.castShadow = true;
+            child.receiveShadow = true;
+            child.material = new THREE.MeshPhongMaterial({
+              color: 0xF4E4D7,
+              shininess: 100,
+              emissive: 0x7621B0,
+              emissiveIntensity: 0.2,
+              wireframe: false
+            });
+          }
+        });
 
-    const head = new THREE.Mesh(geometry, material);
-    scene.add(head);
-
-    const glowGeometry = new THREE.IcosahedronGeometry(1.05, 6);
-    const glowMaterial = new THREE.MeshBasicMaterial({
-      color: 0xB600A8,
-      transparent: true,
-      opacity: 0.2,
-      wireframe: false
-    });
-    const glow = new THREE.Mesh(glowGeometry, glowMaterial);
-    scene.add(glow);
+        scene.add(model);
+        modelRef.current = model;
+      },
+      (progress) => {
+        console.log('Loading model...', (progress.loaded / progress.total) * 100 + '%');
+      },
+      (error) => {
+        console.error('Error loading model:', error);
+      }
+    );
 
     let mouseX = 0;
     let mouseY = 0;
 
     const handleMouseMove = (e) => {
-      const rect = canvas.getBoundingClientRect();
-      mouseX = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-      mouseY = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+      mouseX = (e.clientX / window.innerWidth) * 2 - 1;
+      mouseY = -(e.clientY / window.innerHeight) * 2 + 1;
     };
 
-    canvas.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mousemove', handleMouseMove);
 
+    // Animation loop
     let animationId;
     const animate = () => {
       animationId = requestAnimationFrame(animate);
 
-      head.rotation.x += 0.003 + mouseY * 0.01;
-      head.rotation.y += 0.005 + mouseX * 0.01;
-      
-      glow.rotation.x = head.rotation.x;
-      glow.rotation.y = head.rotation.y;
-
-      const pulse = Math.sin(Date.now() * 0.001) * 0.1 + 0.9;
-      material.emissiveIntensity = pulse * 0.4;
-      glow.material.opacity = pulse * 0.2;
+      if (modelRef.current) {
+        modelRef.current.rotation.y += 0.003;
+        modelRef.current.rotation.x += mouseY * 0.0005;
+        modelRef.current.rotation.z += mouseX * 0.0005;
+      }
 
       renderer.render(scene, camera);
     };
 
     animate();
 
+    // Handle window resize
+    const handleResize = () => {
+      if (!containerRef.current) return;
+      const width = containerRef.current.clientWidth;
+      const height = containerRef.current.clientHeight;
+      camera.aspect = width / height;
+      camera.updateProjectionMatrix();
+      renderer.setSize(width, height);
+    };
+
+    window.addEventListener('resize', handleResize);
+
     return () => {
       cancelAnimationFrame(animationId);
-      canvas.removeEventListener('mousemove', handleMouseMove);
-      if (containerRef.current && canvas.parentNode === containerRef.current) {
-        containerRef.current.removeChild(canvas);
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('resize', handleResize);
+      if (containerRef.current && renderer.domElement.parentNode === containerRef.current) {
+        containerRef.current.removeChild(renderer.domElement);
       }
-      geometry.dispose();
-      material.dispose();
-      glowMaterial.dispose();
       renderer.dispose();
     };
   }, []);
@@ -247,11 +260,23 @@ const Avatar3D = () => {
         ref={containerRef}
         className="relative w-[250px] sm:w-[320px] md:w-[380px] rounded-3xl overflow-hidden border-2 border-[#D7E2EA]/40"
         style={{
-          background: 'radial-gradient(circle at 30% 30%, rgba(215, 226, 234, 0.1), transparent 50%)',
+          background: 'radial-gradient(circle at 30% 30%, rgba(215, 226, 234, 0.15), transparent 50%)',
           boxShadow: '0 20px 60px rgba(182, 0, 168, 0.4), inset 0 0 60px rgba(215, 226, 234, 0.08)',
           height: '350px'
         }}
       />
+
+      <motion.div 
+        className="absolute inset-0 rounded-3xl pointer-events-none"
+        animate={{ opacity: [0.2, 0.5, 0.2] }}
+        transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+        style={{
+          background: 'radial-gradient(circle at 50% 50%, rgba(182, 0, 168, 0.3), transparent 70%)',
+        }}
+      />
+
+      <div className="absolute top-0 left-0 w-40 h-40 bg-gradient-to-br from-[#B600A8]/20 to-transparent rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-0 right-0 w-40 h-40 bg-gradient-to-tl from-[#7621B0]/20 to-transparent rounded-full blur-3xl pointer-events-none" />
     </Magnet>
   );
 };
