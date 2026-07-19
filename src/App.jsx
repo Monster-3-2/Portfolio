@@ -3,7 +3,6 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 import { Mail, Github, Linkedin, Download, ExternalLink } from 'lucide-react';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
 const GradientHeading = ({ children, className = '' }) => (
   <h1 className={`bg-gradient-to-b from-[#646973] to-[#BBCCD7] bg-clip-text text-transparent ${className}`}>
@@ -129,129 +128,214 @@ const Avatar3D = () => {
   const sceneRef = useRef(null);
   const rendererRef = useRef(null);
   const modelRef = useRef(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!containerRef.current) return;
 
-    // Scene setup
-    const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x0C0C0C);
-    sceneRef.current = scene;
+    try {
+      // Scene setup
+      const scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x0C0C0C);
+      sceneRef.current = scene;
 
-    const camera = new THREE.PerspectiveCamera(
-      75,
-      containerRef.current.clientWidth / containerRef.current.clientHeight,
-      0.1,
-      1000
-    );
-    camera.position.z = 2;
-
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setSize(containerRef.current.clientWidth, containerRef.current.clientHeight);
-    renderer.setPixelRatio(window.devicePixelRatio);
-    renderer.shadowMap.enabled = true;
-    containerRef.current.appendChild(renderer.domElement);
-    rendererRef.current = renderer;
-
-    // Lighting
-    const ambientLight = new THREE.AmbientLight(0xffffff, 1);
-    scene.add(ambientLight);
-
-    const pointLight = new THREE.PointLight(0xB600A8, 1.5);
-    pointLight.position.set(5, 5, 5);
-    pointLight.castShadow = true;
-    scene.add(pointLight);
-
-    const pointLight2 = new THREE.PointLight(0x7621B0, 1);
-    pointLight2.position.set(-5, -5, 5);
-    scene.add(pointLight2);
-
-    const pointLight3 = new THREE.PointLight(0xffffff, 0.5);
-    pointLight3.position.set(0, 3, 3);
-    scene.add(pointLight3);
-
-    // Load GLB model
-    const loader = new GLTFLoader();
-    loader.load(
-      '/white_mesh.glb',
-      (gltf) => {
-        const model = gltf.scene;
-        model.scale.set(1.2, 1.2, 1.2);
-        model.position.y = 0;
-
-        // Apply materials
-        model.traverse((child) => {
-          if (child.isMesh) {
-            child.castShadow = true;
-            child.receiveShadow = true;
-            child.material = new THREE.MeshPhongMaterial({
-              color: 0xF4E4D7,
-              shininess: 100,
-              emissive: 0x7621B0,
-              emissiveIntensity: 0.2,
-              wireframe: false
-            });
-          }
-        });
-
-        scene.add(model);
-        modelRef.current = model;
-      },
-      (progress) => {
-        console.log('Loading model...', (progress.loaded / progress.total) * 100 + '%');
-      },
-      (error) => {
-        console.error('Error loading model:', error);
-      }
-    );
-
-    let mouseX = 0;
-    let mouseY = 0;
-
-    const handleMouseMove = (e) => {
-      mouseX = (e.clientX / window.innerWidth) * 2 - 1;
-      mouseY = -(e.clientY / window.innerHeight) * 2 + 1;
-    };
-
-    window.addEventListener('mousemove', handleMouseMove);
-
-    // Animation loop
-    let animationId;
-    const animate = () => {
-      animationId = requestAnimationFrame(animate);
-
-      if (modelRef.current) {
-        modelRef.current.rotation.y += 0.003;
-        modelRef.current.rotation.x += mouseY * 0.0005;
-        modelRef.current.rotation.z += mouseX * 0.0005;
-      }
-
-      renderer.render(scene, camera);
-    };
-
-    animate();
-
-    // Handle window resize
-    const handleResize = () => {
-      if (!containerRef.current) return;
       const width = containerRef.current.clientWidth;
       const height = containerRef.current.clientHeight;
-      camera.aspect = width / height;
-      camera.updateProjectionMatrix();
+
+      const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
+      camera.position.z = 2.5;
+
+      const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
       renderer.setSize(width, height);
-    };
+      renderer.setPixelRatio(window.devicePixelRatio);
+      renderer.shadowMap.enabled = true;
+      containerRef.current.appendChild(renderer.domElement);
+      rendererRef.current = renderer;
 
-    window.addEventListener('resize', handleResize);
+      // Lighting
+      const ambientLight = new THREE.AmbientLight(0xffffff, 1.2);
+      scene.add(ambientLight);
 
-    return () => {
-      cancelAnimationFrame(animationId);
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('resize', handleResize);
-      if (containerRef.current && renderer.domElement.parentNode === containerRef.current) {
-        containerRef.current.removeChild(renderer.domElement);
-      }
-      renderer.dispose();
-    };
+      const pointLight = new THREE.PointLight(0xB600A8, 1.5);
+      pointLight.position.set(5, 5, 5);
+      pointLight.castShadow = true;
+      scene.add(pointLight);
+
+      const pointLight2 = new THREE.PointLight(0x7621B0, 1);
+      pointLight2.position.set(-5, -5, 5);
+      scene.add(pointLight2);
+
+      const pointLight3 = new THREE.PointLight(0xffffff, 0.8);
+      pointLight3.position.set(0, 3, 3);
+      scene.add(pointLight3);
+
+      // Create fallback geometry if model doesn't load
+      const createFallbackAvatar = () => {
+        const group = new THREE.Group();
+
+        // Head
+        const headGeom = new THREE.SphereGeometry(0.8, 32, 32);
+        const headMat = new THREE.MeshPhongMaterial({
+          color: 0xF4E4D7,
+          shininess: 100,
+          emissive: 0x7621B0,
+          emissiveIntensity: 0.2,
+        });
+        const head = new THREE.Mesh(headGeom, headMat);
+        head.position.y = 0.2;
+        group.add(head);
+
+        // Hair
+        const hairGeom = new THREE.ConeGeometry(0.9, 0.8, 32);
+        const hairMat = new THREE.MeshPhongMaterial({
+          color: 0x2C1810,
+          shininess: 30,
+        });
+        const hair = new THREE.Mesh(hairGeom, hairMat);
+        hair.position.y = 1.1;
+        group.add(hair);
+
+        // Left Eye
+        const eyeGeom = new THREE.SphereGeometry(0.15, 16, 16);
+        const eyeMat = new THREE.MeshPhongMaterial({ color: 0xFFFFFF });
+        const leftEye = new THREE.Mesh(eyeGeom, eyeMat);
+        leftEye.position.set(-0.25, 0.4, 0.7);
+        group.add(leftEye);
+
+        // Right Eye
+        const rightEye = new THREE.Mesh(eyeGeom, eyeMat);
+        rightEye.position.set(0.25, 0.4, 0.7);
+        group.add(rightEye);
+
+        // Left Iris
+        const irisGeom = new THREE.SphereGeometry(0.08, 16, 16);
+        const irisMat = new THREE.MeshPhongMaterial({ color: 0x4A90E2 });
+        const leftIris = new THREE.Mesh(irisGeom, irisMat);
+        leftIris.position.set(-0.25, 0.4, 0.82);
+        group.add(leftIris);
+
+        // Right Iris
+        const rightIris = new THREE.Mesh(irisGeom, irisMat);
+        rightIris.position.set(0.25, 0.4, 0.82);
+        group.add(rightIris);
+
+        // Mouth
+        const mouthGeom = new THREE.TorusGeometry(0.2, 0.05, 16, 100, 0, Math.PI);
+        const mouthMat = new THREE.MeshPhongMaterial({ color: 0xC85A54 });
+        const mouth = new THREE.Mesh(mouthGeom, mouthMat);
+        mouth.position.set(0, -0.1, 0.7);
+        mouth.rotation.z = Math.PI;
+        group.add(mouth);
+
+        // Nose
+        const noseGeom = new THREE.ConeGeometry(0.08, 0.3, 16);
+        const noseMat = new THREE.MeshPhongMaterial({ color: 0xD4845E });
+        const nose = new THREE.Mesh(noseGeom, noseMat);
+        nose.position.set(0, 0.1, 0.75);
+        nose.rotation.x = Math.PI / 2;
+        group.add(nose);
+
+        return group;
+      };
+
+      // Load GLB model
+      const loader = new GLTFLoader();
+      
+      loader.load(
+        'https://cdn.jsdelivr.net/npm/@google/model-viewer/dist/assets/model-viewer.usdz',
+        (gltf) => {
+          const model = gltf.scene;
+          model.scale.set(1.2, 1.2, 1.2);
+          model.position.y = 0;
+
+          model.traverse((child) => {
+            if (child.isMesh) {
+              child.castShadow = true;
+              child.receiveShadow = true;
+              child.material = new THREE.MeshPhongMaterial({
+                color: 0xF4E4D7,
+                shininess: 100,
+                emissive: 0x7621B0,
+                emissiveIntensity: 0.2,
+              });
+            }
+          });
+
+          scene.add(model);
+          modelRef.current = model;
+          setLoading(false);
+        },
+        undefined,
+        () => {
+          // Model loading failed - use fallback
+          const fallback = createFallbackAvatar();
+          scene.add(fallback);
+          modelRef.current = fallback;
+          setLoading(false);
+        }
+      );
+
+      // If model URL doesn't work, use fallback immediately
+      setTimeout(() => {
+        if (!modelRef.current) {
+          const fallback = createFallbackAvatar();
+          scene.add(fallback);
+          modelRef.current = fallback;
+          setLoading(false);
+        }
+      }, 3000);
+
+      let mouseX = 0;
+      let mouseY = 0;
+
+      const handleMouseMove = (e) => {
+        mouseX = (e.clientX / window.innerWidth) * 2 - 1;
+        mouseY = -(e.clientY / window.innerHeight) * 2 + 1;
+      };
+
+      window.addEventListener('mousemove', handleMouseMove);
+
+      // Animation loop
+      let animationId;
+      const animate = () => {
+        animationId = requestAnimationFrame(animate);
+
+        if (modelRef.current) {
+          modelRef.current.rotation.y += 0.003;
+          modelRef.current.rotation.x += mouseY * 0.0005;
+          modelRef.current.rotation.z += mouseX * 0.0005;
+        }
+
+        renderer.render(scene, camera);
+      };
+
+      animate();
+
+      // Handle window resize
+      const handleResize = () => {
+        if (!containerRef.current) return;
+        const newWidth = containerRef.current.clientWidth;
+        const newHeight = containerRef.current.clientHeight;
+        camera.aspect = newWidth / newHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(newWidth, newHeight);
+      };
+
+      window.addEventListener('resize', handleResize);
+
+      return () => {
+        cancelAnimationFrame(animationId);
+        window.removeEventListener('mousemove', handleMouseMove);
+        window.removeEventListener('resize', handleResize);
+        if (containerRef.current && renderer.domElement.parentNode === containerRef.current) {
+          containerRef.current.removeChild(renderer.domElement);
+        }
+        renderer.dispose();
+      };
+    } catch (error) {
+      console.error('Avatar3D error:', error);
+      setLoading(false);
+    }
   }, []);
 
   return (
@@ -264,7 +348,17 @@ const Avatar3D = () => {
           boxShadow: '0 20px 60px rgba(182, 0, 168, 0.4), inset 0 0 60px rgba(215, 226, 234, 0.08)',
           height: '350px'
         }}
-      />
+      >
+        {loading && (
+          <div className="absolute inset-0 flex items-center justify-center bg-[#0C0C0C]/80 z-50">
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
+              className="w-8 h-8 border-2 border-[#B600A8] border-t-transparent rounded-full"
+            />
+          </div>
+        )}
+      </div>
 
       <motion.div 
         className="absolute inset-0 rounded-3xl pointer-events-none"
@@ -386,7 +480,7 @@ const FeaturedProjectsSection = () => {
         </h2>
       </FadeIn>
 
-      <div className="max-w-6xl mx-auto relative h-[300vh]">
+      <div className="max-w-6xl mx-auto relative">
         {projects.map((project, idx) => (
           <ProjectCard key={idx} project={project} index={idx} total={projects.length} />
         ))}
@@ -396,30 +490,16 @@ const FeaturedProjectsSection = () => {
 };
 
 const ProjectCard = ({ project, index, total }) => {
-  const containerRef = useRef(null);
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ['start center', 'end center']
-  });
-
-  const scale = useTransform(scrollYProgress, [0, 1], [0.9, 1]);
-  const y = useTransform(scrollYProgress, [0, 1], [50, 0]);
-
   return (
     <motion.div
-      ref={containerRef}
-      style={{ 
-        scale,
-        y,
-      }}
-      className="sticky top-24 md:top-32 rounded-[40px] sm:rounded-[50px] md:rounded-[60px] border-2 border-[#D7E2EA] bg-[#0C0C0C] p-4 sm:p-6 md:p-8"
-      initial={{ opacity: 0 }}
-      whileInView={{ opacity: 1 }}
-      viewport={{ once: false }}
-      transition={{ duration: 0.5 }}
+      className="rounded-[40px] sm:rounded-[50px] md:rounded-[60px] border-2 border-[#D7E2EA] bg-[#0C0C0C] p-4 sm:p-6 md:p-8 mb-12"
+      initial={{ opacity: 0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
+      viewport={{ once: false, margin: '50px', amount: 0.1 }}
       style={{
-        zIndex: index,
-        marginTop: index > 0 ? '-60px' : '0',
+        zIndex: total - index,
+        position: 'relative'
       }}
     >
       <div className="flex flex-wrap items-start justify-between gap-4 mb-8 pb-8 border-b border-[#D7E2EA]/20">
