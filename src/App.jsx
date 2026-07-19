@@ -491,69 +491,73 @@ const FeaturedProjectsSection = () => {
 
 const ProjectCard = ({ project, index, total }) => {
   return (
-    <motion.div
-      className="rounded-[40px] sm:rounded-[50px] md:rounded-[60px] border-2 border-[#D7E2EA] bg-[#0C0C0C] p-4 sm:p-6 md:p-8 mb-12"
-      initial={{ opacity: 0, y: 40 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
-      viewport={{ once: false, margin: '50px', amount: 0.1 }}
+    <div
+      className="sticky rounded-[40px] sm:rounded-[50px] md:rounded-[60px] border-2 border-[#D7E2EA] bg-[#0C0C0C] p-4 sm:p-6 md:p-8"
       style={{
+        top: `${index * 40}px`,
         zIndex: total - index,
-        position: 'relative'
+        transition: 'all 0.3s ease-out'
       }}
     >
-      <div className="flex flex-wrap items-start justify-between gap-4 mb-8 pb-8 border-b border-[#D7E2EA]/20">
-        <div className="flex-1 min-w-0">
-          <div className="text-[#D7E2EA] font-black mb-2" style={{ fontSize: 'clamp(3rem, 8vw, 120px)', lineHeight: 1 }}>
-            {project.num}
+      <motion.div
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
+        viewport={{ once: false, margin: '50px', amount: 0.1 }}
+      >
+        <div className="flex flex-wrap items-start justify-between gap-4 mb-8 pb-8 border-b border-[#D7E2EA]/20">
+          <div className="flex-1 min-w-0">
+            <div className="text-[#D7E2EA] font-black mb-2" style={{ fontSize: 'clamp(3rem, 8vw, 120px)', lineHeight: 1 }}>
+              {project.num}
+            </div>
+            <p className="text-[#D7E2EA]/60 font-light uppercase tracking-wide text-xs sm:text-sm">
+              {project.category}
+            </p>
+            <h3 className="text-[#D7E2EA] font-medium uppercase mt-2" style={{ fontSize: 'clamp(1.1rem, 2.3vw, 2rem)' }}>
+              {project.name}
+            </h3>
+            <p className="text-[#D7E2EA]/70 font-light text-xs sm:text-sm mt-3">
+              {project.tech}
+            </p>
+            <p className="text-[#D7E2EA]/80 font-light leading-relaxed mt-3 text-sm sm:text-base max-w-xl">
+              {project.desc}
+            </p>
           </div>
-          <p className="text-[#D7E2EA]/60 font-light uppercase tracking-wide text-xs sm:text-sm">
-            {project.category}
-          </p>
-          <h3 className="text-[#D7E2EA] font-medium uppercase mt-2" style={{ fontSize: 'clamp(1.1rem, 2.3vw, 2rem)' }}>
-            {project.name}
-          </h3>
-          <p className="text-[#D7E2EA]/70 font-light text-xs sm:text-sm mt-3">
-            {project.tech}
-          </p>
-          <p className="text-[#D7E2EA]/80 font-light leading-relaxed mt-3 text-sm sm:text-base max-w-xl">
-            {project.desc}
-          </p>
+          <motion.button
+            whileHover={{ scale: 1.1 }}
+            className="px-4 sm:px-6 py-2 rounded-full border-2 border-[#D7E2EA] text-[#D7E2EA] font-medium uppercase tracking-widest text-xs hover:bg-[#D7E2EA]/10 transition-colors flex items-center gap-2 flex-shrink-0"
+          >
+            View <ExternalLink size={14} />
+          </motion.button>
         </div>
-        <motion.button
-          whileHover={{ scale: 1.1 }}
-          className="px-4 sm:px-6 py-2 rounded-full border-2 border-[#D7E2EA] text-[#D7E2EA] font-medium uppercase tracking-widest text-xs hover:bg-[#D7E2EA]/10 transition-colors flex items-center gap-2 flex-shrink-0"
-        >
-          View <ExternalLink size={14} />
-        </motion.button>
-      </div>
 
-      <div className="grid grid-cols-[35%_65%] gap-3 sm:gap-4 md:gap-6">
-        <div className="space-y-3 sm:space-y-4 md:space-y-6 flex flex-col">
+        <div className="grid grid-cols-[35%_65%] gap-3 sm:gap-4 md:gap-6">
+          <div className="space-y-3 sm:space-y-4 md:space-y-6 flex flex-col">
+            <img
+              src={project.col1Img1}
+              alt=""
+              className="rounded-[30px] sm:rounded-[40px] md:rounded-[50px] object-cover w-full"
+              style={{ height: 'clamp(100px, 14vw, 200px)' }}
+              loading="lazy"
+            />
+            <img
+              src={project.col1Img2}
+              alt=""
+              className="rounded-[30px] sm:rounded-[40px] md:rounded-[50px] object-cover w-full flex-1"
+              style={{ height: 'clamp(140px, 20vw, 300px)' }}
+              loading="lazy"
+            />
+          </div>
+
           <img
-            src={project.col1Img1}
+            src={project.col2Img}
             alt=""
-            className="rounded-[30px] sm:rounded-[40px] md:rounded-[50px] object-cover w-full"
-            style={{ height: 'clamp(100px, 14vw, 200px)' }}
-            loading="lazy"
-          />
-          <img
-            src={project.col1Img2}
-            alt=""
-            className="rounded-[30px] sm:rounded-[40px] md:rounded-[50px] object-cover w-full flex-1"
-            style={{ height: 'clamp(140px, 20vw, 300px)' }}
+            className="rounded-[30px] sm:rounded-[40px] md:rounded-[50px] object-cover w-full h-full"
             loading="lazy"
           />
         </div>
-
-        <img
-          src={project.col2Img}
-          alt=""
-          className="rounded-[30px] sm:rounded-[40px] md:rounded-[50px] object-cover w-full h-full"
-          loading="lazy"
-        />
-      </div>
-    </motion.div>
+      </motion.div>
+    </div>
   );
 };
 
