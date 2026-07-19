@@ -136,7 +136,7 @@ const Avatar3D = () => {
     try {
       // Scene setup
       const scene = new THREE.Scene();
-      scene.background = null; // Changed to null for container-level background transitions
+      scene.background = null;
       sceneRef.current = scene;
 
       const width = containerRef.current.clientWidth;
@@ -221,7 +221,6 @@ const Avatar3D = () => {
         (gltf) => {
           const model = gltf.scene;
           
-          // Balanced dimensions to frame standard human skeletal rigs inside the section layout
           model.scale.set(0.95, 0.95, 0.95);
           model.position.y = -0.95; 
 
@@ -230,7 +229,6 @@ const Avatar3D = () => {
               child.castShadow = true;
               child.receiveShadow = true;
               
-              // Maintain original colors and custom designs maps
               if (child.material) {
                 child.material.roughness = 0.55;
                 child.material.metalness = 0.15;
@@ -269,7 +267,6 @@ const Avatar3D = () => {
         animationId = requestAnimationFrame(animate);
 
         if (modelRef.current) {
-          // Smooth structural rotations synchronized to tracking offsets
           modelRef.current.rotation.y += 0.004;
           modelRef.current.rotation.x = THREE.MathUtils.lerp(modelRef.current.rotation.x, mouseY * 0.2, 0.05);
           modelRef.current.rotation.z = THREE.MathUtils.lerp(modelRef.current.rotation.z, -mouseX * 0.1, 0.05);
