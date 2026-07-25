@@ -134,7 +134,6 @@ const Avatar3D = () => {
     if (!containerRef.current) return;
 
     try {
-      // Scene setup
       const scene = new THREE.Scene();
       scene.background = new THREE.Color(0x0C0C0C);
       sceneRef.current = scene;
@@ -153,7 +152,6 @@ const Avatar3D = () => {
       containerRef.current.appendChild(renderer.domElement);
       rendererRef.current = renderer;
 
-      // Lighting
       const ambientLight = new THREE.AmbientLight(0xffffff, 1.2);
       scene.add(ambientLight);
 
@@ -170,12 +168,10 @@ const Avatar3D = () => {
       pointLight3.position.set(0, 3, 3);
       scene.add(pointLight3);
 
-      // Create fallback geometry if model doesn't load
-      const createFallbackAvatar = () => {
+      const createAvatar = () => {
         const group = new THREE.Group();
 
-        // Skin tone color
-        const skinColor = 0xD4A574; // Warm brown skin tone
+        const skinColor = 0xD4A574;
 
         // Head
         const headGeom = new THREE.SphereGeometry(1.2, 32, 32);
@@ -187,6 +183,7 @@ const Avatar3D = () => {
         });
         const head = new THREE.Mesh(headGeom, headMat);
         head.position.y = 0.4;
+        head.castShadow = true;
         group.add(head);
 
         // Hair
@@ -197,18 +194,21 @@ const Avatar3D = () => {
         });
         const hair = new THREE.Mesh(hairGeom, hairMat);
         hair.position.y = 1.6;
+        hair.castShadow = true;
         group.add(hair);
 
-        // Left Eye
+        // Left Eye White
         const eyeGeom = new THREE.SphereGeometry(0.2, 16, 16);
         const eyeMat = new THREE.MeshPhongMaterial({ color: 0xFFFFFF });
         const leftEye = new THREE.Mesh(eyeGeom, eyeMat);
         leftEye.position.set(-0.35, 0.7, 1);
+        leftEye.castShadow = true;
         group.add(leftEye);
 
-        // Right Eye
+        // Right Eye White
         const rightEye = new THREE.Mesh(eyeGeom, eyeMat);
         rightEye.position.set(0.35, 0.7, 1);
+        rightEye.castShadow = true;
         group.add(rightEye);
 
         // Left Iris
@@ -244,6 +244,7 @@ const Avatar3D = () => {
         const neckMat = new THREE.MeshPhongMaterial({ color: skinColor });
         const neck = new THREE.Mesh(neckGeom, neckMat);
         neck.position.set(0, -0.6, 0);
+        neck.castShadow = true;
         group.add(neck);
 
         // Shoulders
@@ -252,57 +253,16 @@ const Avatar3D = () => {
         const shoulders = new THREE.Mesh(shoulderGeom, shoulderMat);
         shoulders.position.set(0, -1.2, 0);
         shoulders.scale.set(1.8, 0.8, 1);
+        shoulders.castShadow = true;
         group.add(shoulders);
 
         return group;
       };
 
-      // Load GLB model
-      const loader = new GLTFLoader();
-      
-      loader.load(
-        'https://cdn.jsdelivr.net/npm/@google/model-viewer/dist/assets/model-viewer.usdz',
-        (gltf) => {
-          const model = gltf.scene;
-          model.scale.set(2, 2, 2);
-          model.position.y = 0.2;
-
-          model.traverse((child) => {
-            if (child.isMesh) {
-              child.castShadow = true;
-              child.receiveShadow = true;
-              child.material = new THREE.MeshPhongMaterial({
-                color: 0xD4A574,
-                shininess: 100,
-                emissive: 0x7621B0,
-                emissiveIntensity: 0.2,
-              });
-            }
-          });
-
-          scene.add(model);
-          modelRef.current = model;
-          setLoading(false);
-        },
-        undefined,
-        () => {
-          // Model loading failed - use fallback
-          const fallback = createFallbackAvatar();
-          scene.add(fallback);
-          modelRef.current = fallback;
-          setLoading(false);
-        }
-      );
-
-      // If model URL doesn't work, use fallback immediately
-      setTimeout(() => {
-        if (!modelRef.current) {
-          const fallback = createFallbackAvatar();
-          scene.add(fallback);
-          modelRef.current = fallback;
-          setLoading(false);
-        }
-      }, 3000);
+      const avatar = createAvatar();
+      scene.add(avatar);
+      modelRef.current = avatar;
+      setLoading(false);
 
       let mouseX = 0;
       let mouseY = 0;
@@ -314,7 +274,6 @@ const Avatar3D = () => {
 
       window.addEventListener('mousemove', handleMouseMove);
 
-      // Animation loop
       let animationId;
       const animate = () => {
         animationId = requestAnimationFrame(animate);
@@ -330,7 +289,6 @@ const Avatar3D = () => {
 
       animate();
 
-      // Handle window resize
       const handleResize = () => {
         if (!containerRef.current) return;
         const newWidth = containerRef.current.clientWidth;
