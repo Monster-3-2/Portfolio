@@ -134,101 +134,149 @@ const Avatar3D = () => {
     if (!containerRef.current) return;
 
     try {
+      // Scene setup
       const scene = new THREE.Scene();
-      scene.background = null;
+      scene.background = new THREE.Color(0x0C0C0C);
       sceneRef.current = scene;
 
       const width = containerRef.current.clientWidth;
       const height = containerRef.current.clientHeight;
 
-      const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
-      camera.position.set(0, 0, 2.5);
+      const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
+      camera.position.z = 2.2;
+      camera.position.y = 0.3;
 
       const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
       renderer.setSize(width, height);
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.setPixelRatio(window.devicePixelRatio);
       renderer.shadowMap.enabled = true;
       containerRef.current.appendChild(renderer.domElement);
       rendererRef.current = renderer;
 
-      const ambientLight = new THREE.AmbientLight(0xffffff, 1.5);
+      // Lighting
+      const ambientLight = new THREE.AmbientLight(0xffffff, 1.2);
       scene.add(ambientLight);
 
-      const directionalLight = new THREE.DirectionalLight(0xffffff, 1.8);
-      directionalLight.position.set(2, 4, 5);
-      directionalLight.castShadow = true;
-      scene.add(directionalLight);
-
-      const pointLight = new THREE.PointLight(0xB600A8, 2);
-      pointLight.position.set(3, 2, 2);
+      const pointLight = new THREE.PointLight(0xB600A8, 1.5);
+      pointLight.position.set(5, 5, 5);
+      pointLight.castShadow = true;
       scene.add(pointLight);
 
-      const pointLight2 = new THREE.PointLight(0x7621B0, 1.5);
-      pointLight2.position.set(-3, -2, 2);
+      const pointLight2 = new THREE.PointLight(0x7621B0, 1);
+      pointLight2.position.set(-5, -5, 5);
       scene.add(pointLight2);
 
+      const pointLight3 = new THREE.PointLight(0xffffff, 0.8);
+      pointLight3.position.set(0, 3, 3);
+      scene.add(pointLight3);
+
+      // Create fallback geometry if model doesn't load
       const createFallbackAvatar = () => {
         const group = new THREE.Group();
 
-        const headGeom = new THREE.SphereGeometry(0.5, 32, 32);
+        // Skin tone color
+        const skinColor = 0xD4A574; // Warm brown skin tone
+
+        // Head
+        const headGeom = new THREE.SphereGeometry(1.2, 32, 32);
         const headMat = new THREE.MeshPhongMaterial({
-          color: 0xF4E4D7,
+          color: skinColor,
           shininess: 100,
           emissive: 0x7621B0,
           emissiveIntensity: 0.2,
         });
         const head = new THREE.Mesh(headGeom, headMat);
-        head.position.y = 0.2;
+        head.position.y = 0.4;
         group.add(head);
 
-        const hairGeom = new THREE.ConeGeometry(0.55, 0.6, 32);
-        const hairMat = new THREE.MeshPhongMaterial({ color: 0x2C1810, shininess: 30 });
+        // Hair
+        const hairGeom = new THREE.ConeGeometry(1.3, 1.2, 32);
+        const hairMat = new THREE.MeshPhongMaterial({
+          color: 0x2C1810,
+          shininess: 30,
+        });
         const hair = new THREE.Mesh(hairGeom, hairMat);
-        hair.position.y = 0.75;
+        hair.position.y = 1.6;
         group.add(hair);
 
-        const eyeGeom = new THREE.SphereGeometry(0.08, 16, 16);
+        // Left Eye
+        const eyeGeom = new THREE.SphereGeometry(0.2, 16, 16);
         const eyeMat = new THREE.MeshPhongMaterial({ color: 0xFFFFFF });
         const leftEye = new THREE.Mesh(eyeGeom, eyeMat);
-        leftEye.position.set(-0.18, 0.3, 0.42);
+        leftEye.position.set(-0.35, 0.7, 1);
         group.add(leftEye);
 
+        // Right Eye
         const rightEye = new THREE.Mesh(eyeGeom, eyeMat);
-        rightEye.position.set(0.18, 0.3, 0.42);
+        rightEye.position.set(0.35, 0.7, 1);
         group.add(rightEye);
 
-        const irisGeom = new THREE.SphereGeometry(0.04, 16, 16);
-        const irisMat = new THREE.MeshPhongMaterial({ color: 0x4A90E2 });
+        // Left Iris
+        const irisGeom = new THREE.SphereGeometry(0.12, 16, 16);
+        const irisMat = new THREE.MeshPhongMaterial({ color: 0x8B6F47 });
         const leftIris = new THREE.Mesh(irisGeom, irisMat);
-        leftIris.position.set(-0.18, 0.3, 0.49);
+        leftIris.position.set(-0.35, 0.7, 1.15);
         group.add(leftIris);
 
+        // Right Iris
         const rightIris = new THREE.Mesh(irisGeom, irisMat);
-        rightIris.position.set(0.18, 0.3, 0.49);
+        rightIris.position.set(0.35, 0.7, 1.15);
         group.add(rightIris);
+
+        // Mouth
+        const mouthGeom = new THREE.TorusGeometry(0.3, 0.08, 16, 100, 0, Math.PI);
+        const mouthMat = new THREE.MeshPhongMaterial({ color: 0xC85A54 });
+        const mouth = new THREE.Mesh(mouthGeom, mouthMat);
+        mouth.position.set(0, 0.2, 1);
+        mouth.rotation.z = Math.PI;
+        group.add(mouth);
+
+        // Nose
+        const noseGeom = new THREE.ConeGeometry(0.12, 0.4, 16);
+        const noseMat = new THREE.MeshPhongMaterial({ color: 0xB89968 });
+        const nose = new THREE.Mesh(noseGeom, noseMat);
+        nose.position.set(0, 0.4, 1.1);
+        nose.rotation.x = Math.PI / 2;
+        group.add(nose);
+
+        // Neck
+        const neckGeom = new THREE.CylinderGeometry(0.4, 0.5, 0.6, 16);
+        const neckMat = new THREE.MeshPhongMaterial({ color: skinColor });
+        const neck = new THREE.Mesh(neckGeom, neckMat);
+        neck.position.set(0, -0.6, 0);
+        group.add(neck);
+
+        // Shoulders
+        const shoulderGeom = new THREE.SphereGeometry(0.8, 16, 16);
+        const shoulderMat = new THREE.MeshPhongMaterial({ color: 0x4A4A4A });
+        const shoulders = new THREE.Mesh(shoulderGeom, shoulderMat);
+        shoulders.position.set(0, -1.2, 0);
+        shoulders.scale.set(1.8, 0.8, 1);
+        group.add(shoulders);
 
         return group;
       };
 
+      // Load GLB model
       const loader = new GLTFLoader();
       
       loader.load(
-        '/assets/my-avatar.glb', 
+        'https://cdn.jsdelivr.net/npm/@google/model-viewer/dist/assets/model-viewer.usdz',
         (gltf) => {
           const model = gltf.scene;
-          
-          model.scale.set(0.95, 0.95, 0.95);
-          model.position.y = -0.95; 
+          model.scale.set(2, 2, 2);
+          model.position.y = 0.2;
 
           model.traverse((child) => {
             if (child.isMesh) {
               child.castShadow = true;
               child.receiveShadow = true;
-              
-              if (child.material) {
-                child.material.roughness = 0.55;
-                child.material.metalness = 0.15;
-              }
+              child.material = new THREE.MeshPhongMaterial({
+                color: 0xD4A574,
+                shininess: 100,
+                emissive: 0x7621B0,
+                emissiveIntensity: 0.2,
+              });
             }
           });
 
@@ -237,14 +285,24 @@ const Avatar3D = () => {
           setLoading(false);
         },
         undefined,
-        (error) => {
-          console.error('Avatar failed to parse, loading local viewport meshes:', error);
+        () => {
+          // Model loading failed - use fallback
           const fallback = createFallbackAvatar();
           scene.add(fallback);
           modelRef.current = fallback;
           setLoading(false);
         }
       );
+
+      // If model URL doesn't work, use fallback immediately
+      setTimeout(() => {
+        if (!modelRef.current) {
+          const fallback = createFallbackAvatar();
+          scene.add(fallback);
+          modelRef.current = fallback;
+          setLoading(false);
+        }
+      }, 3000);
 
       let mouseX = 0;
       let mouseY = 0;
@@ -256,14 +314,15 @@ const Avatar3D = () => {
 
       window.addEventListener('mousemove', handleMouseMove);
 
+      // Animation loop
       let animationId;
       const animate = () => {
         animationId = requestAnimationFrame(animate);
 
         if (modelRef.current) {
-          modelRef.current.rotation.y += 0.004;
-          modelRef.current.rotation.x = THREE.MathUtils.lerp(modelRef.current.rotation.x, mouseY * 0.2, 0.05);
-          modelRef.current.rotation.z = THREE.MathUtils.lerp(modelRef.current.rotation.z, -mouseX * 0.1, 0.05);
+          modelRef.current.rotation.y += 0.003;
+          modelRef.current.rotation.x += mouseY * 0.0005;
+          modelRef.current.rotation.z += mouseX * 0.0005;
         }
 
         renderer.render(scene, camera);
@@ -271,6 +330,7 @@ const Avatar3D = () => {
 
       animate();
 
+      // Handle window resize
       const handleResize = () => {
         if (!containerRef.current) return;
         const newWidth = containerRef.current.clientWidth;
@@ -292,7 +352,7 @@ const Avatar3D = () => {
         renderer.dispose();
       };
     } catch (error) {
-      console.error('Avatar3D Runtime Context Fault:', error);
+      console.error('Avatar3D error:', error);
       setLoading(false);
     }
   }, []);
@@ -305,7 +365,7 @@ const Avatar3D = () => {
         style={{
           background: 'radial-gradient(circle at 30% 30%, rgba(215, 226, 234, 0.15), transparent 50%)',
           boxShadow: '0 20px 60px rgba(182, 0, 168, 0.4), inset 0 0 60px rgba(215, 226, 234, 0.08)',
-          height: '420px'
+          height: '350px'
         }}
       >
         {loading && (
@@ -389,7 +449,7 @@ const HeroSection = () => {
       </div>
 
       <FadeIn delay={0.6} y={30}>
-        <div className="absolute right-6 md:right-10 top-1/4 md:top-1/2 md:-translate-y-1/2 z-10">
+        <div className="absolute right-6 md:right-10 top-1/3 md:top-1/2 md:-translate-y-1/2 z-10">
           <Avatar3D />
         </div>
       </FadeIn>
