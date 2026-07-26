@@ -66,46 +66,12 @@ const FadeIn = ({ children, delay = 0, duration = 0.7, x = 0, y = 30 }) => (
 );
 
 const HeroSection = () => {
-  const [backgroundImage, setBackgroundImage] = useState(null);
-
-  const handleImageUpload = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        setBackgroundImage(event.target.result);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
   return (
     <section 
       className="h-screen bg-[#0C0C0C] flex flex-col overflow-x-clip font-['Kanit'] relative"
-      style={{
-        backgroundImage: backgroundImage ? `url(${backgroundImage})` : 'none',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundAttachment: 'fixed'
-      }}
     >
-      {/* Overlay to darken background image */}
-      {backgroundImage && (
-        <div className="absolute inset-0 bg-black/50 z-0" />
-      )}
 
-      {/* Upload button - positioned in top right */}
-      <div className="absolute top-6 right-6 z-50">
-        <label className="flex items-center gap-2 px-4 py-2 rounded-full border-2 border-[#D7E2EA] text-[#D7E2EA] font-medium uppercase tracking-widest text-xs hover:bg-[#D7E2EA]/10 transition-colors cursor-pointer">
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleImageUpload}
-            className="hidden"
-          />
-          Upload Image
-        </label>
-      </div>
+
 
       <FadeIn delay={0} y={-20}>
         <nav className="flex justify-between items-center px-6 md:px-10 pt-6 md:pt-8 relative z-50 backdrop-blur-xl bg-white/8 rounded-2xl mx-6 md:mx-10 border border-white/15 shadow-2xl" style={{ backdropFilter: 'blur(20px)', boxShadow: '0 8px 32px rgba(255, 255, 255, 0.1)' }}>
