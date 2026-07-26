@@ -66,13 +66,45 @@ const FadeIn = ({ children, delay = 0, duration = 0.7, x = 0, y = 30 }) => (
 );
 
 const HeroSection = () => {
+  const [backgroundImage, setBackgroundImage] = useState(null);
+ 
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setBackgroundImage(event.target.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+ 
+  const defaultBg = 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1200&h=800&fit=crop';
+ 
   return (
     <section 
       className="h-screen bg-[#0C0C0C] flex flex-col overflow-x-clip font-['Kanit'] relative"
+      style={{
+        backgroundImage: backgroundImage ? `url(${backgroundImage})` : `url(${defaultBg})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed'
+      }}
     >
-
-
-
+      <div className="absolute inset-0 bg-black/50 z-0" />
+ 
+      <div className="absolute top-6 right-6 z-50 hidden">
+        <label className="flex items-center gap-2 px-4 py-2 rounded-full border-2 border-[#D7E2EA] text-[#D7E2EA] font-medium uppercase tracking-widest text-xs hover:bg-[#D7E2EA]/10 transition-colors cursor-pointer">
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleImageUpload}
+            className="hidden"
+          />
+          Upload Image
+        </label>
+      </div>
+ 
       <FadeIn delay={0} y={-20}>
         <nav className="flex justify-between items-center px-6 md:px-10 pt-6 md:pt-8 relative z-50 backdrop-blur-xl bg-white/8 rounded-2xl mx-6 md:mx-10 border border-white/15 shadow-2xl" style={{ backdropFilter: 'blur(20px)', boxShadow: '0 8px 32px rgba(255, 255, 255, 0.1)' }}>
           <div className="px-6 md:px-8 py-3">
@@ -97,7 +129,7 @@ const HeroSection = () => {
           </div>
         </nav>
       </FadeIn>
-
+ 
       <div className="flex-1 flex flex-col justify-between relative z-20">
         <div className="mt-6 sm:mt-4 md:-mt-5 overflow-hidden px-6 md:px-10">
           <FadeIn delay={0.15} y={40}>
@@ -111,7 +143,7 @@ const HeroSection = () => {
             </p>
           </FadeIn>
         </div>
-
+ 
         <div className="flex justify-between items-end pb-7 sm:pb-8 md:pb-10 px-6 md:px-10 gap-4 flex-wrap">
           <FadeIn delay={0.35} y={20}>
             <p className="text-[#D7E2EA] font-light uppercase tracking-wide leading-snug" style={{ fontSize: 'clamp(0.7rem, 1.3vw, 1.2rem)', maxWidth: 'clamp(140px, 25vw, 240px)' }}>
