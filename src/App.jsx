@@ -68,17 +68,6 @@ const FadeIn = ({ children, delay = 0, duration = 0.7, x = 0, y = 30 }) => (
 const HeroSection = () => {
   const [backgroundImage, setBackgroundImage] = useState(null);
  
-  const handleImageUpload = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        setBackgroundImage(event.target.result);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
- 
   const defaultBg = 'https://raw.githubusercontent.com/Monster-3-2/Portfolio/main/public/hero-bg.jpg';
  
   return (
