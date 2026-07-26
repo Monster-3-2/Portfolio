@@ -1,8 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { Mail, Github, Linkedin, Download, ExternalLink } from 'lucide-react';
-import * as THREE from 'three';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
 const GradientHeading = ({ children, className = '' }) => (
   <h1 className={`bg-gradient-to-b from-[#646973] to-[#BBCCD7] bg-clip-text text-transparent ${className}`}>
@@ -67,294 +65,48 @@ const FadeIn = ({ children, delay = 0, duration = 0.7, x = 0, y = 30 }) => (
   </motion.div>
 );
 
-const Magnet = ({ children, padding = 150, strength = 3 }) => {
-  const ref = useRef(null);
-  const [isActive, setIsActive] = useState(false);
-  const [offset, setOffset] = useState({ x: 0, y: 0 });
+const HeroSection = () => {
+  const [backgroundImage, setBackgroundImage] = useState(null);
 
-  useEffect(() => {
-    const element = ref.current;
-    if (!element) return;
-
-    const handleMouseMove = (e) => {
-      const rect = element.getBoundingClientRect();
-      const centerX = rect.left + rect.width / 2;
-      const centerY = rect.top + rect.height / 2;
-      const mouseX = e.clientX;
-      const mouseY = e.clientY;
-
-      const distX = mouseX - centerX;
-      const distY = mouseY - centerY;
-      const distance = Math.sqrt(distX * distX + distY * distY);
-
-      if (distance < padding) {
-        setIsActive(true);
-        setOffset({ x: distX / strength, y: distY / strength });
-      } else {
-        setIsActive(false);
-      }
-    };
-
-    const handleMouseLeave = () => {
-      setIsActive(false);
-      setOffset({ x: 0, y: 0 });
-    };
-
-    window.addEventListener('mousemove', handleMouseMove);
-    element.addEventListener('mouseleave', handleMouseLeave);
-
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      element.removeEventListener('mouseleave', handleMouseLeave);
-    };
-  }, [padding, strength]);
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setBackgroundImage(event.target.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   return (
-    <div
-      ref={ref}
+    <section 
+      className="h-screen bg-[#0C0C0C] flex flex-col overflow-x-clip font-['Kanit'] relative"
       style={{
-        transform: `translate3d(${offset.x}px, ${offset.y}px, 0)`,
-        transition: isActive ? 'transform 0.3s ease-out' : 'transform 0.6s ease-in-out',
-        willChange: 'transform'
+        backgroundImage: backgroundImage ? `url(${backgroundImage})` : 'none',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed'
       }}
     >
-      {children}
-    </div>
-  );
-};
+      {/* Overlay to darken background image */}
+      {backgroundImage && (
+        <div className="absolute inset-0 bg-black/50 z-0" />
+      )}
 
-const Avatar3D = () => {
-  const containerRef = useRef(null);
-  const sceneRef = useRef(null);
-  const rendererRef = useRef(null);
-  const modelRef = useRef(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    if (!containerRef.current) return;
-
-    try {
-      const scene = new THREE.Scene();
-      scene.background = new THREE.Color(0x0C0C0C);
-      sceneRef.current = scene;
-
-      const width = containerRef.current.clientWidth;
-      const height = containerRef.current.clientHeight;
-
-      const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
-      camera.position.z = 2.2;
-      camera.position.y = 0.3;
-
-      const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-      renderer.setSize(width, height);
-      renderer.setPixelRatio(window.devicePixelRatio);
-      renderer.shadowMap.enabled = true;
-      containerRef.current.appendChild(renderer.domElement);
-      rendererRef.current = renderer;
-
-      const ambientLight = new THREE.AmbientLight(0xffffff, 1.2);
-      scene.add(ambientLight);
-
-      const pointLight = new THREE.PointLight(0xB600A8, 1.5);
-      pointLight.position.set(5, 5, 5);
-      pointLight.castShadow = true;
-      scene.add(pointLight);
-
-      const pointLight2 = new THREE.PointLight(0x7621B0, 1);
-      pointLight2.position.set(-5, -5, 5);
-      scene.add(pointLight2);
-
-      const pointLight3 = new THREE.PointLight(0xffffff, 0.8);
-      pointLight3.position.set(0, 3, 3);
-      scene.add(pointLight3);
-
-      const createAvatar = () => {
-        const group = new THREE.Group();
-
-        const skinColor = 0xD4A574;
-
-        // Head
-        const headGeom = new THREE.SphereGeometry(1.2, 32, 32);
-        const headMat = new THREE.MeshPhongMaterial({
-          color: skinColor,
-          shininess: 100,
-          emissive: 0x7621B0,
-          emissiveIntensity: 0.2,
-        });
-        const head = new THREE.Mesh(headGeom, headMat);
-        head.position.y = 0.4;
-        head.castShadow = true;
-        group.add(head);
-
-        // Hair
-        const hairGeom = new THREE.ConeGeometry(1.3, 1.2, 32);
-        const hairMat = new THREE.MeshPhongMaterial({
-          color: 0x2C1810,
-          shininess: 30,
-        });
-        const hair = new THREE.Mesh(hairGeom, hairMat);
-        hair.position.y = 1.6;
-        hair.castShadow = true;
-        group.add(hair);
-
-        // Left Eye White
-        const eyeGeom = new THREE.SphereGeometry(0.2, 16, 16);
-        const eyeMat = new THREE.MeshPhongMaterial({ color: 0xFFFFFF });
-        const leftEye = new THREE.Mesh(eyeGeom, eyeMat);
-        leftEye.position.set(-0.35, 0.7, 1);
-        leftEye.castShadow = true;
-        group.add(leftEye);
-
-        // Right Eye White
-        const rightEye = new THREE.Mesh(eyeGeom, eyeMat);
-        rightEye.position.set(0.35, 0.7, 1);
-        rightEye.castShadow = true;
-        group.add(rightEye);
-
-        // Left Iris
-        const irisGeom = new THREE.SphereGeometry(0.12, 16, 16);
-        const irisMat = new THREE.MeshPhongMaterial({ color: 0x8B6F47 });
-        const leftIris = new THREE.Mesh(irisGeom, irisMat);
-        leftIris.position.set(-0.35, 0.7, 1.15);
-        group.add(leftIris);
-
-        // Right Iris
-        const rightIris = new THREE.Mesh(irisGeom, irisMat);
-        rightIris.position.set(0.35, 0.7, 1.15);
-        group.add(rightIris);
-
-        // Mouth
-        const mouthGeom = new THREE.TorusGeometry(0.3, 0.08, 16, 100, 0, Math.PI);
-        const mouthMat = new THREE.MeshPhongMaterial({ color: 0xC85A54 });
-        const mouth = new THREE.Mesh(mouthGeom, mouthMat);
-        mouth.position.set(0, 0.2, 1);
-        mouth.rotation.z = Math.PI;
-        group.add(mouth);
-
-        // Nose
-        const noseGeom = new THREE.ConeGeometry(0.12, 0.4, 16);
-        const noseMat = new THREE.MeshPhongMaterial({ color: 0xB89968 });
-        const nose = new THREE.Mesh(noseGeom, noseMat);
-        nose.position.set(0, 0.4, 1.1);
-        nose.rotation.x = Math.PI / 2;
-        group.add(nose);
-
-        // Neck
-        const neckGeom = new THREE.CylinderGeometry(0.4, 0.5, 0.6, 16);
-        const neckMat = new THREE.MeshPhongMaterial({ color: skinColor });
-        const neck = new THREE.Mesh(neckGeom, neckMat);
-        neck.position.set(0, -0.6, 0);
-        neck.castShadow = true;
-        group.add(neck);
-
-        // Shoulders
-        const shoulderGeom = new THREE.SphereGeometry(0.8, 16, 16);
-        const shoulderMat = new THREE.MeshPhongMaterial({ color: 0x4A4A4A });
-        const shoulders = new THREE.Mesh(shoulderGeom, shoulderMat);
-        shoulders.position.set(0, -1.2, 0);
-        shoulders.scale.set(1.8, 0.8, 1);
-        shoulders.castShadow = true;
-        group.add(shoulders);
-
-        return group;
-      };
-
-      const avatar = createAvatar();
-      scene.add(avatar);
-      modelRef.current = avatar;
-      setLoading(false);
-
-      let mouseX = 0;
-      let mouseY = 0;
-
-      const handleMouseMove = (e) => {
-        mouseX = (e.clientX / window.innerWidth) * 2 - 1;
-        mouseY = -(e.clientY / window.innerHeight) * 2 + 1;
-      };
-
-      window.addEventListener('mousemove', handleMouseMove);
-
-      let animationId;
-      const animate = () => {
-        animationId = requestAnimationFrame(animate);
-
-        if (modelRef.current) {
-          modelRef.current.rotation.y += 0.003;
-          modelRef.current.rotation.x += mouseY * 0.0005;
-          modelRef.current.rotation.z += mouseX * 0.0005;
-        }
-
-        renderer.render(scene, camera);
-      };
-
-      animate();
-
-      const handleResize = () => {
-        if (!containerRef.current) return;
-        const newWidth = containerRef.current.clientWidth;
-        const newHeight = containerRef.current.clientHeight;
-        camera.aspect = newWidth / newHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize(newWidth, newHeight);
-      };
-
-      window.addEventListener('resize', handleResize);
-
-      return () => {
-        cancelAnimationFrame(animationId);
-        window.removeEventListener('mousemove', handleMouseMove);
-        window.removeEventListener('resize', handleResize);
-        if (containerRef.current && renderer.domElement.parentNode === containerRef.current) {
-          containerRef.current.removeChild(renderer.domElement);
-        }
-        renderer.dispose();
-      };
-    } catch (error) {
-      console.error('Avatar3D error:', error);
-      setLoading(false);
-    }
-  }, []);
-
-  return (
-    <Magnet padding={150} strength={3}>
-      <div
-        ref={containerRef}
-        className="relative w-[250px] sm:w-[320px] md:w-[380px] rounded-3xl overflow-hidden border-2 border-[#D7E2EA]/40"
-        style={{
-          background: 'radial-gradient(circle at 30% 30%, rgba(215, 226, 234, 0.15), transparent 50%)',
-          boxShadow: '0 20px 60px rgba(182, 0, 168, 0.4), inset 0 0 60px rgba(215, 226, 234, 0.08)',
-          height: '350px'
-        }}
-      >
-        {loading && (
-          <div className="absolute inset-0 flex items-center justify-center bg-[#0C0C0C]/80 z-50">
-            <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
-              className="w-8 h-8 border-2 border-[#B600A8] border-t-transparent rounded-full"
-            />
-          </div>
-        )}
+      {/* Upload button - positioned in top right */}
+      <div className="absolute top-6 right-6 z-50">
+        <label className="flex items-center gap-2 px-4 py-2 rounded-full border-2 border-[#D7E2EA] text-[#D7E2EA] font-medium uppercase tracking-widest text-xs hover:bg-[#D7E2EA]/10 transition-colors cursor-pointer">
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleImageUpload}
+            className="hidden"
+          />
+          Upload Image
+        </label>
       </div>
 
-      <motion.div 
-        className="absolute inset-0 rounded-3xl pointer-events-none"
-        animate={{ opacity: [0.2, 0.5, 0.2] }}
-        transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-        style={{
-          background: 'radial-gradient(circle at 50% 50%, rgba(182, 0, 168, 0.3), transparent 70%)',
-        }}
-      />
-
-      <div className="absolute top-0 left-0 w-40 h-40 bg-gradient-to-br from-[#B600A8]/20 to-transparent rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-0 right-0 w-40 h-40 bg-gradient-to-tl from-[#7621B0]/20 to-transparent rounded-full blur-3xl pointer-events-none" />
-    </Magnet>
-  );
-};
-
-const HeroSection = () => {
-  return (
-    <section className="h-screen bg-[#0C0C0C] flex flex-col overflow-x-clip font-['Kanit'] relative">
       <FadeIn delay={0} y={-20}>
         <nav className="flex justify-between items-center px-6 md:px-10 pt-6 md:pt-8 relative z-50 backdrop-blur-xl bg-white/8 rounded-2xl mx-6 md:mx-10 border border-white/15 shadow-2xl" style={{ backdropFilter: 'blur(20px)', boxShadow: '0 8px 32px rgba(255, 255, 255, 0.1)' }}>
           <div className="px-6 md:px-8 py-3">
@@ -405,12 +157,6 @@ const HeroSection = () => {
           </FadeIn>
         </div>
       </div>
-
-      <FadeIn delay={0.6} y={30}>
-        <div className="absolute right-6 md:right-10 top-1/3 md:top-1/2 md:-translate-y-1/2 z-10">
-          <Avatar3D />
-        </div>
-      </FadeIn>
     </section>
   );
 };
