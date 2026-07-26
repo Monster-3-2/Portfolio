@@ -79,7 +79,7 @@ const HeroSection = () => {
     }
   };
  
-  const defaultBg = 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1200&h=800&fit=crop';
+  const defaultBg = 'https://raw.githubusercontent.com/Monster-3-2/Portfolio/main/public/hero-bg.jpg';
  
   return (
     <section 
