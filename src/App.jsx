@@ -66,21 +66,18 @@ const FadeIn = ({ children, delay = 0, duration = 0.7, x = 0, y = 30 }) => (
 );
 
 const HeroSection = () => {
-  const [backgroundImage, setBackgroundImage] = useState(null);
- 
-  const defaultBg = 'https://raw.githubusercontent.com/Monster-3-2/Portfolio/main/public/hero-bg.jpg';
- 
   return (
     <section 
       className="h-screen bg-[#0C0C0C] flex flex-col overflow-x-clip font-['Kanit'] relative"
       style={{
-        backgroundImage: backgroundImage ? `url(${backgroundImage})` : `url(${defaultBg})`,
+        backgroundImage: 'url(/hero-bg.jpg)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundAttachment: 'fixed'
       }}
     >
-      <div className="absolute inset-0 bg-black/50 z-0" />
+      {/* Reduced dark overlay to 20% opacity */}
+      <div className="absolute inset-0 bg-black/20 z-0" />
  
       <FadeIn delay={0} y={-20}>
         <nav className="flex justify-between items-center px-6 md:px-10 pt-6 md:pt-8 relative z-50 backdrop-blur-xl bg-white/8 rounded-2xl mx-6 md:mx-10 border border-white/15 shadow-2xl" style={{ backdropFilter: 'blur(20px)', boxShadow: '0 8px 32px rgba(255, 255, 255, 0.1)' }}>
